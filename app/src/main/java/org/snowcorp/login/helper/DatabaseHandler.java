@@ -135,7 +135,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Re crate database
+     * Recreate database
      * Delete all tables and create them again
      * */
     public void resetTables(){
