@@ -3,8 +3,10 @@ package org.snowcorp.login;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -32,7 +34,7 @@ import java.util.Map;
 public class RegisterActivity extends AppCompatActivity {
     private static final String TAG = RegisterActivity.class.getSimpleName();
 
-    private Button btnRegister, btnLinkToLogin;
+    private MaterialButton btnRegister, btnLinkToLogin;
     private TextInputLayout inputName, inputEmail, inputPassword;
     private ProgressDialog pDialog;
 
@@ -41,11 +43,11 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        inputName = (TextInputLayout) findViewById(R.id.rTextName);
-        inputEmail = (TextInputLayout) findViewById(R.id.rTextEmail);
-        inputPassword = (TextInputLayout) findViewById(R.id.rTextPassword);
-        btnRegister = (Button) findViewById(R.id.btnRegister);
-        btnLinkToLogin = (Button) findViewById(R.id.btnLinkToLoginScreen);
+        inputName = findViewById(R.id.rTextName);
+        inputEmail = findViewById(R.id.rTextEmail);
+        inputPassword = findViewById(R.id.rTextPassword);
+        btnRegister = findViewById(R.id.btnRegister);
+        btnLinkToLogin = findViewById(R.id.btnLinkToLoginScreen);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -140,7 +142,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "Registration Error: " + error.getMessage());
+                Log.e(TAG, "Registration Error: " + error.getMessage(), error);
                 Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                 hideDialog();
             }
@@ -149,7 +151,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 // Posting params to register url
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("name", name);
                 params.put("email", email);
                 params.put("password", password);

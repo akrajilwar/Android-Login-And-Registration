@@ -4,9 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -17,12 +14,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +44,7 @@ public class HomeActivity extends AppCompatActivity {
     private static final String TAG = HomeActivity.class.getSimpleName();
 
     private TextView txtName, txtEmail;
-    private Button btnChangePass, btnLogout;
+    private MaterialButton btnChangePass, btnLogout;
     private SessionManager session;
     private DatabaseHandler db;
 
@@ -55,10 +57,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        txtName = (TextView) findViewById(R.id.name);
-        txtEmail = (TextView) findViewById(R.id.email);
-        btnChangePass = (Button) findViewById(R.id.change_password);
-        btnLogout = (Button) findViewById(R.id.logout);
+        txtName = findViewById(R.id.name);
+        txtEmail = findViewById(R.id.email);
+        btnChangePass = findViewById(R.id.change_password);
+        btnLogout = findViewById(R.id.logout);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -107,8 +109,8 @@ public class HomeActivity extends AppCompatActivity {
                 dialogBuilder.setTitle("Change Password");
                 dialogBuilder.setCancelable(false);
 
-                final TextInputLayout oldPassword = (TextInputLayout) dialogView.findViewById(R.id.old_password);
-                final TextInputLayout newPassword = (TextInputLayout) dialogView.findViewById(R.id.new_password);
+                final TextInputLayout oldPassword = dialogView.findViewById(R.id.old_password);
+                final TextInputLayout newPassword = dialogView.findViewById(R.id.new_password);
 
                 dialogBuilder.setPositiveButton("Change",  new DialogInterface.OnClickListener() {
                     @Override

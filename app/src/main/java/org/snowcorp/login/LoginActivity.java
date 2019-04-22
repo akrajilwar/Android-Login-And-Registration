@@ -4,9 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -16,12 +13,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     private static String KEY_EMAIL = "email";
     private static String KEY_CREATED_AT = "created_at";
 
-    private Button btnLogin, btnLinkToRegister, btnForgotPass;
+    private MaterialButton btnLogin, btnLinkToRegister, btnForgotPass;
     private TextInputLayout inputEmail, inputPassword;
     private ProgressDialog pDialog;
 
@@ -57,11 +59,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        inputEmail = (TextInputLayout) findViewById(R.id.lTextEmail);
-        inputPassword = (TextInputLayout) findViewById(R.id.lTextPassword);
-        btnLogin = (Button) findViewById(R.id.btnLogin);
-        btnLinkToRegister = (Button) findViewById(R.id.btnLinkToRegisterScreen);
-        btnForgotPass = (Button) findViewById(R.id.btnForgotPassword);
+        inputEmail = findViewById(R.id.lTextEmail);
+        inputPassword = findViewById(R.id.lTextPassword);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnLinkToRegister = findViewById(R.id.btnLinkToRegisterScreen);
+        btnForgotPass = findViewById(R.id.btnForgotPassword);
 
         // Progress dialog
         pDialog = new ProgressDialog(this);
@@ -138,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
         dialogBuilder.setTitle("Forgot Password");
         dialogBuilder.setCancelable(false);
 
-        final TextInputLayout mEditEmail = (TextInputLayout) dialogView.findViewById(R.id.editEmail);
+        final TextInputLayout mEditEmail = dialogView.findViewById(R.id.editEmail);
 
         dialogBuilder.setPositiveButton("Reset",  new DialogInterface.OnClickListener() {
             @Override
