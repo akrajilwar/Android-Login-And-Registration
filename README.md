@@ -42,3 +42,19 @@ Read Full tutorial
   - Change Main Url inside Functions.Java File 
   - If you are using localhost:[PORT] change Mainurl to MAIN_URL = "http://10.0.2.2:[PORT]/android_login/"
   - If you are using just localhost change Mainurl to MAIN_URL = "http://10.0.2.2/android_login/"
+
+## Steps for WEBHOSTING
+  - Git clone this Repository
+  - Copy android_login folder to cpanel=>www
+  - Create database android_login =>
+  
+        create table users( idint(11) primary key auto_increment, unique_idvarchar(23) not null unique, namevarchar(50) not null, emailvarchar(100) not null unique, encrypted_passwordvarchar(250) not null, otpint(6) NOT NULL, verifiedint(1) NOT NULL DEFAULT '0', created_at datetime DEFAULT NULL );
+    
+  - Change Config.php file for username and password
+      $username = "username"; 
+      $password = "pass"; 
+      $host = "localhost"; 
+      $dbname = "username_android_login"; //Check at phpmyadmin whats the name of database
+      
+  - Change Main Url inside Functions.Java File // HTTP[S] not HTTP TRY BOTH
+  - Change Mainurl to MAIN_URL = "https://hostname.example.com/username_android_login/" example "https://cpanel.example.com/username_android_login/"
