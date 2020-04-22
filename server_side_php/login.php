@@ -19,7 +19,7 @@ if (!empty($_POST)) {
 
     catch (PDOException $ex) {
         $response["error"] = true;
-        $response["message"] = "Database Error1. Please Try Again!";
+        $response["message"] = $ex->getMessage();
         die(json_encode($response));
     }
 
