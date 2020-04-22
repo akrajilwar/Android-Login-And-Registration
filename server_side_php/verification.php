@@ -19,7 +19,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
     catch (PDOException $ex) {
 
         $response["error"] = true;
-        $response["message"] = "Database Error1. Please Try Again!";
+        $response["message"] = $ex->getMessage();
         die(json_encode($response));
         
     }
@@ -56,7 +56,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
 
         catch (PDOException $ex) {
             $response["error"] = true;
-            $response["message"] = "Database Error1. Please Try Again!";
+            $response["message"] = $ex->getMessage();
             die(json_encode($response));
         }
 
@@ -98,6 +98,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
             $from = "support@androidlearning.in";
             $headers = "From:" . $from;
 
+	    // Comment below line if you run in localhost
             mail($email,$subject,$message,$headers);
 
             $response["error"] = false;
