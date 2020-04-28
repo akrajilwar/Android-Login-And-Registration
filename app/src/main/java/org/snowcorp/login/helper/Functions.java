@@ -1,8 +1,18 @@
 package org.snowcorp.login.helper;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
+import org.snowcorp.login.R;
+import org.snowcorp.login.widget.ProgressBarDialog;
 
 /**
  * Created by Akshay Raj on 06-02-2017.
@@ -13,7 +23,7 @@ import android.view.inputmethod.InputMethodManager;
 public class Functions {
 
     //Main URL
-    private static String MAIN_URL = "http://192.168.43.166/~snow/android_login/";
+    private static String MAIN_URL = "http://192.168.43.65/android_login/";
 
     // Login URL
     public static String LOGIN_URL = MAIN_URL + "login.php";
@@ -32,10 +42,9 @@ public class Functions {
      * Function to logout user
      * Resets the temporary data stored in SQLite Database
      * */
-    public boolean logoutUser(Context context){
+    public void logoutUser(Context context){
         DatabaseHandler db = new DatabaseHandler(context);
         db.resetTables();
-        return true;
     }
 
     /**
@@ -57,5 +66,20 @@ public class Functions {
                         Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(
                 activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    public static void showProgressDialog(Context context, String title) {
+        FragmentManager fm = ((AppCompatActivity)context).getSupportFragmentManager();
+        DialogFragment newFragment = ProgressBarDialog.newInstance(title);
+        newFragment.show(fm, "dialog");
+    }
+
+    public static void hideProgressDialog(Context context) {
+        FragmentManager fm = ((AppCompatActivity)context).getSupportFragmentManager();
+        Fragment prev = fm.findFragmentByTag("dialog");
+        if (prev != null) {
+            DialogFragment df = (DialogFragment) prev;
+            df.dismiss();
+        }
     }
 }

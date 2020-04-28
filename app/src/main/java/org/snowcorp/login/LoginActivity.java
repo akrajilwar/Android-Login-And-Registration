@@ -1,13 +1,10 @@
 package org.snowcorp.login;
 
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -16,11 +13,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
@@ -33,12 +27,14 @@ import org.snowcorp.login.helper.SessionManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by Akshay Raj on 6/16/2016.
  * akshay@snowcorp.org
  * www.snowcorp.org
  */
+
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -49,7 +45,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private MaterialButton btnLogin, btnLinkToRegister, btnForgotPass;
     private TextInputLayout inputEmail, inputPassword;
-    private ProgressDialog pDialog;
 
     private SessionManager session;
     private DatabaseHandler db;
@@ -59,21 +54,17 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        inputEmail = findViewById(R.id.lTextEmail);
-        inputPassword = findViewById(R.id.lTextPassword);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnLinkToRegister = findViewById(R.id.btnLinkToRegisterScreen);
-        btnForgotPass = findViewById(R.id.btnForgotPassword);
-
-        // Progress dialog
-        pDialog = new ProgressDialog(this);
-        pDialog.setCancelable(false);
+        inputEmail = findViewById(R.id.edit_email);
+        inputPassword = findViewById(R.id.edit_password);
+        btnLogin = findViewById(R.id.button_login);
+        btnLinkToRegister = findViewById(R.id.button_register);
+        btnForgotPass = findViewById(R.id.button_reset);
 
         // create sqlite database
-        db = new DatabaseHandler(getApplicationContext());
+        db = new DatabaseHandler(this);
 
         // session manager
-        session = new SessionManager(getApplicationContext());
+        session = new SessionManager(this);
 
         // check user is already logged in
         if (session.isLoggedIn()) {
@@ -90,78 +81,53 @@ public class LoginActivity extends AppCompatActivity {
 
     private void init() {
         // Login button Click Event
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // Hide Keyboard
-                Functions.hideSoftKeyboard(LoginActivity.this);
+        btnLogin.setOnClickListener(view -> {
+            // Hide Keyboard
+            Functions.hideSoftKeyboard(LoginActivity.this);
 
-                String email = inputEmail.getEditText().getText().toString().trim();
-                String password = inputPassword.getEditText().getText().toString().trim();
+            String email = Objects.requireNonNull(inputEmail.getEditText()).getText().toString().trim();
+            String password = Objects.requireNonNull(inputPassword.getEditText()).getText().toString().trim();
 
-                // Check for empty data in the form
-                if (!email.isEmpty() && !password.isEmpty()) {
-                    if (Functions.isValidEmailAddress(email)) {
-                        // login user
-                        loginProcess(email, password);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Email is not valid!", Toast.LENGTH_SHORT).show();
-                    }
+            // Check for empty data in the form
+            if (!email.isEmpty() && !password.isEmpty()) {
+                if (Functions.isValidEmailAddress(email)) {
+                    // login user
+                    loginProcess(email, password);
                 } else {
-                    // Prompt user to enter credentials
-                    Toast.makeText(getApplicationContext(), "Please enter the credentials!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Email is not valid!", Toast.LENGTH_SHORT).show();
                 }
+            } else {
+                // Prompt user to enter credentials
+                Toast.makeText(getApplicationContext(), "Please enter the credentials!", Toast.LENGTH_LONG).show();
             }
-
         });
 
         // Link to Register Screen
-        btnLinkToRegister.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(i);
-            }
+        btnLinkToRegister.setOnClickListener(view -> {
+            Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(i);
         });
 
         // Forgot Password Dialog
-        btnForgotPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                forgotPasswordDialog();
-            }
-        });
+        btnForgotPass.setOnClickListener(v -> forgotPasswordDialog());
     }
 
     private void forgotPasswordDialog() {
-        final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.reset_password, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.reset_password, null);
 
-        dialogBuilder.setView(dialogView);
-        dialogBuilder.setTitle("Forgot Password");
-        dialogBuilder.setCancelable(false);
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setTitle("Forgot Password")
+                .setCancelable(false)
+                .setPositiveButton("Reset", (dialog, which) -> {})
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .create();
 
-        final TextInputLayout mEditEmail = dialogView.findViewById(R.id.editEmail);
+        TextInputLayout mEditEmail = dialogView.findViewById(R.id.edit_email);
 
-        dialogBuilder.setPositiveButton("Reset",  new DialogInterface.OnClickListener() {
+        Objects.requireNonNull(mEditEmail.getEditText()).addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // empty
-            }
-        });
-
-        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        final AlertDialog alertDialog = dialogBuilder.create();
-
-        mEditEmail.getEditText().addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -177,31 +143,25 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(final DialogInterface dialog) {
-                final Button b = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                b.setEnabled(false);
+        alertDialog.setOnShowListener(dialog -> {
+            final Button b = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            b.setEnabled(false);
 
-                b.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        String email = mEditEmail.getEditText().getText().toString();
+            b.setOnClickListener(view -> {
+                String email = mEditEmail.getEditText().getText().toString();
 
-                        if (!email.isEmpty()) {
-                            if (Functions.isValidEmailAddress(email)) {
-                                resetPassword(email);
-                                dialog.dismiss();
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Email is not valid!", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Fill all values!", Toast.LENGTH_SHORT).show();
-                        }
-
+                if (!email.isEmpty()) {
+                    if (Functions.isValidEmailAddress(email)) {
+                        resetPassword(email);
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Email is not valid!", Toast.LENGTH_SHORT).show();
                     }
-                });
-            }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Fill all values!", Toast.LENGTH_SHORT).show();
+                }
+
+            });
         });
 
         alertDialog.show();
@@ -211,79 +171,70 @@ public class LoginActivity extends AppCompatActivity {
         // Tag used to cancel the request
         String tag_string_req = "req_login";
 
-        pDialog.setMessage("Logging in ...");
-        showDialog();
+        showDialog("Logging in ...");
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                Functions.LOGIN_URL, new Response.Listener<String>() {
+                Functions.LOGIN_URL, response -> {
+                    Log.d(TAG, "Login Response: " + response);
+                    hideDialog();
 
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "Login Response: " + response);
-                hideDialog();
+                    try {
+                        JSONObject jObj = new JSONObject(response);
+                        boolean error = jObj.getBoolean("error");
 
-                try {
-                    JSONObject jObj = new JSONObject(response);
-                    boolean error = jObj.getBoolean("error");
+                        // Check for error node in json
+                        if (!error) {
+                            // user successfully logged in
+                            JSONObject json_user = jObj.getJSONObject("user");
 
-                    // Check for error node in json
-                    if (!error) {
-                        // user successfully logged in
-                        JSONObject json_user = jObj.getJSONObject("user");
+                            Functions logout = new Functions();
+                            logout.logoutUser(getApplicationContext());
 
-                        Functions logout = new Functions();
-                        logout.logoutUser(getApplicationContext());
+                            if(Integer.parseInt(json_user.getString("verified")) == 1){
+                                db.addUser(json_user.getString(KEY_UID), json_user.getString(KEY_NAME),
+                                        json_user.getString(KEY_EMAIL), json_user.getString(KEY_CREATED_AT));
 
-                        if(Integer.parseInt(json_user.getString("verified")) == 1){
-                            db.addUser(json_user.getString(KEY_UID), json_user.getString(KEY_NAME), json_user.getString(KEY_EMAIL), json_user.getString(KEY_CREATED_AT));
-                            Intent upanel = new Intent(LoginActivity.this, HomeActivity.class);
-                            upanel.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(upanel);
+                                Intent upanel = new Intent(LoginActivity.this, HomeActivity.class);
+                                upanel.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(upanel);
 
-                            session.setLogin(true);
+                                session.setLogin(true);
+                            } else {
+                                Bundle b = new Bundle();
+                                b.putString("email", email);
+
+                                Intent upanel = new Intent(LoginActivity.this, EmailVerify.class);
+                                upanel.putExtras(b);
+                                upanel.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(upanel);
+                            }
                             finish();
+
                         } else {
-                            Bundle b = new Bundle();
-                            b.putString("email", email);
-                            Intent upanel = new Intent(LoginActivity.this, EmailVerify.class);
-                            upanel.putExtras(b);
-                            upanel.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(upanel);
-                            finish();
+                            // Error in login. Get the error message
+                            String errorMsg = jObj.getString("message");
+                            Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
                         }
-
-                    } else {
-                        // Error in login. Get the error message
-                        String errorMsg = jObj.getString("message");
-                        Toast.makeText(getApplicationContext(), errorMsg, Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        // JSON error
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
-                } catch (JSONException e) {
-                    // JSON error
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Json error: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
 
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "Login Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                hideDialog();
-            }
-        }) {
-
+                }, error -> {
+                    Log.e(TAG, "Login Error: " + error.getMessage());
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    hideDialog();
+                }) {
             @Override
             protected Map<String, String> getParams() {
                 // Posting parameters to login url
-                Map<String, String> params = new HashMap<String, String>();
+                Map<String, String> params = new HashMap<>();
                 params.put("email", email);
                 params.put("password", password);
 
                 return params;
             }
-
         };
 
         // Adding request to request queue
@@ -294,43 +245,29 @@ public class LoginActivity extends AppCompatActivity {
         // Tag used to cancel the request
         String tag_string_req = "req_reset_pass";
 
-        pDialog.setMessage("Please wait...");
-        showDialog();
+        showDialog("Please wait...");
 
         StringRequest strReq = new StringRequest(Request.Method.POST,
-                Functions.RESET_PASS_URL, new Response.Listener<String>() {
+                Functions.RESET_PASS_URL, response -> {
+                    Log.d(TAG, "Reset Password Response: " + response);
+                    hideDialog();
 
-            @Override
-            public void onResponse(String response) {
-                Log.d(TAG, "Reset Password Response: " + response);
-                hideDialog();
+                    try {
+                        JSONObject jObj = new JSONObject(response);
 
-                try {
-                    JSONObject jObj = new JSONObject(response);
-                    boolean error = jObj.getBoolean("error");
-
-                    if (!error) {
                         Toast.makeText(getApplicationContext(), jObj.getString("message"), Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), jObj.getString("message"), Toast.LENGTH_LONG).show();
+
+                    } catch (JSONException e) {
+                        // JSON error
+                        e.printStackTrace();
+                        Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                     }
 
-                } catch (JSONException e) {
-                    // JSON error
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "Reset Password Error: " + error.getMessage());
-                Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                hideDialog();
-            }
-        }) {
+                }, error -> {
+                    Log.e(TAG, "Reset Password Error: " + error.getMessage());
+                    Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    hideDialog();
+                }) {
 
             @Override
             protected Map<String, String> getParams() {
@@ -344,7 +281,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
+            public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<>();
                 params.put("Content-Type", "application/x-www-form-urlencoded");
                 return params;
@@ -358,13 +295,11 @@ public class LoginActivity extends AppCompatActivity {
         MyApplication.getInstance().addToRequestQueue(strReq, tag_string_req);
     }
 
-    private void showDialog() {
-        if (!pDialog.isShowing())
-            pDialog.show();
+    private void showDialog(String title) {
+        Functions.showProgressDialog(LoginActivity.this, title);
     }
 
     private void hideDialog() {
-        if (pDialog.isShowing())
-            pDialog.dismiss();
+        Functions.hideProgressDialog(LoginActivity.this);
     }
 }
