@@ -39,7 +39,6 @@ if (!empty($_POST)) {
         $response["user"]["uid"] = $row["unique_id"];
         $response["user"]["name"] = $row["name"];
         $response["user"]["email"] = $row["email"];
-        $response["user"]["otp"] = $row["otp"];
         $response["user"]["verified"] = $row["verified"];
         $response["user"]["created_at"] = $row["created_at"];
         die(json_encode($response));
@@ -51,8 +50,7 @@ if (!empty($_POST)) {
     }
 
 } else {
-
-    echo 'Android Learning';
+    echo json_encode(array("message" => "Method not supported!"));
 }
 
 ?>
