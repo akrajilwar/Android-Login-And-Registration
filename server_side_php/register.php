@@ -19,7 +19,7 @@
             $stmt = $db->prepare($query);
             $result = $stmt->execute($query_params);
         }
-		
+
         catch (PDOException $ex) {
 
             $response["error"] = TRUE;
@@ -37,11 +37,12 @@
 
         } else {
 
-            $query = "INSERT INTO users ( unique_id, name, email, encrypted_password, otp, created_at ) VALUES ( :uuid, :name, :email, :encrypted_password, :otp, NOW() )";
+            $query = "INSERT INTO users ( `unique_id`, `name`, `email`, `encrypted_password`, `otp`, `created_at` ) 
+            VALUES ( :uuid, :name, :email, :encrypted_password, :otp, NOW() )";
 
 			$otp = rand(100000, 999999);
 			$verified = 0;
-			
+
             $query_params = array(
                 ':uuid' => uniqid('', true),
                 ':name' => $_POST['name'],
@@ -65,11 +66,11 @@
             $email = $_POST['email'];
             $subject = "Android Learning Email Verification";
             $message = "Hello $name,\n\nVerify that you own $email.\n\nYou may be asked to enter this confirmation code:\n\n$otp\n\nRegards,\nAndroid Learning.";
-            $from = "support@androidlearning.in";
+            $from = "support@androidlearning.com";
             $headers = "From:" . $from;
 
-	    // comment below line if you run in localhost
-            mail($email,$subject,$message,$headers);
+            // Uncomment this line if you are using online server.
+            //mail($email,$subject,$message,$headers);
 
             $response["error"] = FALSE;
             $response["message"] = "Register successful!";
@@ -77,5 +78,5 @@
         }
 
     } else {
-        echo 'Android Learning';
+        echo json_encode(array("message" => "Method not supported!"));
     }
