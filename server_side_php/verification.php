@@ -98,8 +98,8 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
             $from = "support@androidlearning.in";
             $headers = "From:" . $from;
 
-	    // Comment below line if you run in localhost
-            mail($email,$subject,$message,$headers);
+            // Uncomment below line if you are using online server.
+            //mail($email,$subject,$message,$headers);
 
             $response["error"] = false;
             $response["message"] = "New otp has been sent to your e-mail address.";
@@ -109,5 +109,7 @@ if (isset($_POST['tag']) && $_POST['tag'] != '') {
     }
 
 } else {
-    echo 'Android Learning';
+    echo json_encode(array("message" => "Method not supported!"));
 }
+
+?>
